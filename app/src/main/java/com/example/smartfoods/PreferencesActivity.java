@@ -14,16 +14,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class PreferencesActivity extends AppCompatActivity {
 
-    CheckBox milk;
-    CheckBox egg;
-    CheckBox peanut;
-    CheckBox wheat;
-    CheckBox soy;
-    CheckBox seafood;
-    CheckBox lactose;
-    CheckBox vegan;
-    CheckBox vegetarian;
-    CheckBox gluten;
+    CheckBox paraben;
+    CheckBox fragrance;
+    CheckBox additive;
+    CheckBox sulphate;
+    CheckBox lanolin;
+    CheckBox metal;
+    CheckBox pore;
+    CheckBox sensitive;
+    CheckBox organic;
+    CheckBox cruelty;
     Button apply;
     private String preferenceSelection;
 
@@ -33,16 +33,16 @@ public class PreferencesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_preferences);
 
         preferenceSelection = getIntent().getExtras().getString("preferences");
-        milk = (CheckBox) findViewById(R.id.Milk);
-        egg = (CheckBox) findViewById(R.id.Egg);
-        peanut = (CheckBox) findViewById(R.id.Peanut);
-        wheat = (CheckBox) findViewById(R.id.Wheat);
-        soy = (CheckBox) findViewById(R.id.Soy);
-        seafood = (CheckBox) findViewById(R.id.Seafood);
-        lactose = (CheckBox) findViewById(R.id.Lactose);
-        vegan = (CheckBox) findViewById(R.id.Vegan);
-        vegetarian = (CheckBox) findViewById(R.id.Vegetarian);
-        gluten = (CheckBox) findViewById(R.id.Gluten);
+        paraben = (CheckBox) findViewById(R.id.Paraben);
+        fragrance = (CheckBox) findViewById(R.id.Fragrance);
+        additive = (CheckBox) findViewById(R.id.Additive);
+        sulphate = (CheckBox) findViewById(R.id.Sulphate);
+        lanolin = (CheckBox) findViewById(R.id.Lanolin);
+        metal = (CheckBox) findViewById(R.id.Metal);
+        pore = (CheckBox) findViewById(R.id.Pore);
+        sensitive = (CheckBox) findViewById(R.id.Sensitive);
+        organic = (CheckBox) findViewById(R.id.Organic);
+        cruelty = (CheckBox) findViewById(R.id.Cruelty);
 
         apply = (Button) findViewById(R.id.Apply);
 
@@ -64,104 +64,105 @@ public class PreferencesActivity extends AppCompatActivity {
 
     private void checkPreviousPreferences() {
         if (preferenceSelection.charAt(0) == '1') {
-            milk.setChecked(true);
+            paraben.setChecked(true);
         }
 
         if (preferenceSelection.charAt(1) == '1') {
-            egg.setChecked(true);
+            fragrance.setChecked(true);
         }
 
         if (preferenceSelection.charAt(2) == '1') {
-            peanut.setChecked(true);
+            additive.setChecked(true);
         }
 
         if (preferenceSelection.charAt(3) == '1') {
-            wheat.setChecked(true);
+            sulphate.setChecked(true);
         }
 
         if (preferenceSelection.charAt(4) == '1') {
-            soy.setChecked(true);
+            lanolin.setChecked(true);
         }
 
         if (preferenceSelection.charAt(5) == '1') {
-            seafood.setChecked(true);
+            metal.setChecked(true);
         }
 
         if (preferenceSelection.charAt(6) == '1') {
-            lactose.setChecked(true);
+            pore.setChecked(true);
         }
 
         if (preferenceSelection.charAt(7) == '1') {
-            vegan.setChecked(true);
+            sensitive.setChecked(true);
         }
 
         if (preferenceSelection.charAt(8) == '1') {
-            vegetarian.setChecked(true);
+            organic.setChecked(true);
         }
 
         if (preferenceSelection.charAt(9) == '1') {
-            gluten.setChecked(true);
+            cruelty.setChecked(true);
         }
     }
 
     private String getPreferenceString() {
         StringBuilder sb = new StringBuilder();
 
-        if (milk.isChecked()) {
+        if (paraben.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (egg.isChecked()) {
+        if (fragrance.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (peanut.isChecked()) {
+        if (additive.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (wheat.isChecked()) {
+        if (sulphate.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (soy.isChecked()) {
+        if (lanolin.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (seafood.isChecked()) {
+        if (metal.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (lactose.isChecked()) {
+        if (pore.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (vegan.isChecked()) {
+        if (sensitive.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (vegetarian.isChecked()) {
+        if (organic.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');
         }
 
-        if (gluten.isChecked()) {
+
+        if (cruelty.isChecked()) {
             sb.append('1');
         } else {
             sb.append('0');

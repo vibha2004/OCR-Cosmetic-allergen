@@ -14,7 +14,7 @@ import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.List;
 
-public class OcrGraphic extends GraphicOverlay.Graphic {
+public class  OcrGraphic extends GraphicOverlay.Graphic {
 
     private static final int TEXT_COLOR = Color.WHITE;
     private static Paint sRectPaint;

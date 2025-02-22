@@ -1,8 +1,5 @@
 package com.example.smartfoods;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -12,25 +9,20 @@ public class TextParser  {
 
     public ArrayList<ArrayList<String>> allAllergens;
     public ArrayList<String> userAllergens = new ArrayList<>();
-    public ArrayList<String> allLactose; // the list of things a lactose intolerant person should not eat
-    public ArrayList<String> allVegan;
-    public ArrayList<String> allVegetarian;
-    public ArrayList<String> allGluten;
+    public ArrayList<String> allPore; // the list of things a lactose intolerant person should not eat
+    public ArrayList<String> allSensitive;
+    public ArrayList<String> allOrganic;
+    public ArrayList<String> allCruelty;
 
     public TextParser() {
         this.allAllergens = this.fillInAllergens();
-        this.allLactose = (new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
-                "curds", "lactose", "lactulose", "lactate", "custard", "yogurt")));
-        this.allVegan = (new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
-                "curds", "lactose", "lactulose", "lactate", "custard", "yogurt", "pork", "meat", "beef", "chicken",
-                "honey", "lamb", "veal", "turkey", "egg", "anchovies", "bass", "catfish", "cod", "grouper", "haddock",
-                "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
-                "lobster", "shrimp", "mussels", "squid", "ham", "bacon", "gelatin")));
-        this.allVegetarian = (new ArrayList(Arrays.asList("pork", "meat", "beef", "chicken",
-                "lamb", "veal", "turkey", "egg", "anchovies", "bass", "catfish", "cod", "grouper", "haddock",
-                "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
-                "lobster", "shrimp", "mussels", "squid", "ham", "bacon")));
-        this.allGluten = (new ArrayList(Arrays.asList("wheat", "rye", "barley", "bulgur", "couscous", "farina", "flour")));
+        this.allPore = (new ArrayList(Arrays.asList("lanolin", "coconut", "cocoa", "shea", "wheat", "soybean", "isopropyl", "petrolatum", "sodium", "myristyl", "palmitate", "hexadecyl", "palm", "cetearyl"
+        )));
+        this.allSensitive = (new ArrayList(Arrays.asList("fragrance", "alcohol", "sls", "sles", "parabens", "benzoyl", "retinoids", "salicylic", "aha", "bha", "colorants", "lavender", "peppermint", "oxybenzone", "avobenzone", "formaldehyde", "lanolin"
+        )));
+        this.allOrganic = (new ArrayList(Arrays.asList("synthetic", "parabens", "phthalates", "sulfates", "fragrance", "silicone", "petroleum", "mineraloil", "triclosan", "phenoxyethanol", "peg", "polyethylene", "dyes", "preservatives", "artificial"
+        )));
+        this.allCruelty = (new ArrayList(Arrays.asList("animal","testing")));
     }
 
     public static void main(String[] args) {
@@ -39,8 +31,8 @@ public class TextParser  {
         tt.setUserPreferences("1111111111");
         ArrayList<String> ii = new ArrayList<String>(Arrays.asList(" hoiusdfhium,, oifdshj hif  1.Gelatingt"));
         ArrayList<ArrayList> done = tt.checkAllergens(ii);
-        ArrayList<String> done2 = tt.checkLactose(ii);
-        ArrayList<String> done3 = tt.checkVegan(ii);
+        ArrayList<String> done2 = tt.checkPore(ii);
+        ArrayList<String> done3 = tt.checkSensitive(ii);
 
 
         for (ArrayList<String> sub : done) {
@@ -130,23 +122,20 @@ public class TextParser  {
 
     public ArrayList fillInAllergens() {
         ArrayList returnList = new ArrayList();
-        // milk allergens
-        returnList.add(new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
-                "curds", "lactose", "lactulose", "lactate", "custard", "yogurt")));
-        // egg allergens
-        returnList.add(new ArrayList(Arrays.asList("globulin", "egg", "eggs", "eggnog", "lysozyme", "albumin")));
-        // peanut/nut allergens
-        returnList.add(new ArrayList(Arrays.asList("peanut", "nuts", "nut", "almond",
-                "beechnut", "walnut", "butternut", "cashew",
-                "chestnut", "pecan", "pistachio")));
-        // wheat allergens
-        returnList.add(new ArrayList(Arrays.asList("wheat", "bread", "bulgur", "cereal", "cracker", "flour")));
-        // soy allergens
-        returnList.add(new ArrayList(Arrays.asList("soy", "soya", "miso", "tofu", "edamame")));
-        // seafood allergens
-        returnList.add(new ArrayList(Arrays.asList("anchovies", "bass", "catfish", "cod", "grouper", "haddock",
-                "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
-                "lobster", "shrimp", "mussels", "squid")));
+        // paraben allergens
+        returnList.add(new ArrayList(Arrays.asList("methylparaben", "ethylparaben", "propylparaben", "butylparaben", "isobutylparaben", "isopropylparaben", "benzylparaben","paraben")));
+        // fragrance allergens
+        returnList.add(new ArrayList(Arrays.asList("cinnamal", "eugenol", "isoeugenol", "cinnamyl Alcohol", "geraniol", "hydroxycitronellal", "amyl cinnamal", "linalool", "citral", "limonene", "benzyl alcohol", "coumarin", "benzyl benzoate", "farnesol", "benzyl salicylate", "hexyl cinnamal", "alpha-isomethyl ionone")));
+        // additive allergens
+        returnList.add(new ArrayList(Arrays.asList("tartrazine","carmine","amaranth","annatto","azodyes","cochineal","phenylenediamine"
+        )));
+        // sulphate allergens
+        returnList.add(new ArrayList(Arrays.asList("sodium lauryl sulfate", "sodium laureth sulfate", "ammonium lauryl sulfate", "ammonium laureth sulfate", "magnesium lauryl sulfate", "magnesium laureth sulfate","sulphate")));
+        // lanolin allergens
+        returnList.add(new ArrayList(Arrays.asList("lanolin alcohol", "wool alcohols", "acetylated lanolin alcohol", "lanolin", "isopropyl lanolate", "ethoxylated lanolin", "peg-75 lanolin", "peg-100 lanolin", "peg-16 lanolin", "hydrogenated lanolin", "laneth-10", "laneth-15", "laneth-20", "laneth-25", "lanolin oil"
+        )));
+        // metal allergens
+        returnList.add(new ArrayList(Arrays.asList("nickel", "cobalt", "chromium", "mercury", "gold", "silver", "lead", "zinc")));
         return returnList;
     }
 
@@ -169,8 +158,8 @@ public class TextParser  {
         ArrayList returnList = new ArrayList();
         String returnString = new String();
         ArrayList<String> allIngredients = this.processInput(ingredients);
-        ArrayList mapping = new ArrayList(Arrays.asList("milk allergen(s)", "egg allergen(s)", "peanut/nut allergen(s)",
-                "wheat allergen(s)", "soy allergen(s)", "seafood allergen(s)"));
+        ArrayList mapping = new ArrayList(Arrays.asList("paraben allergen(s)", "fragrance allergen(s)", "additive allergen(s)",
+                "sulphate allergen(s)", "lanolin allergen(s)", "metal allergen(s)"));
 
         // now iterate and find any allergens
         ArrayList<String> temp;
@@ -200,17 +189,17 @@ public class TextParser  {
         return returnList;
     }
 
-    public ArrayList checkLactose(ArrayList<String> ingredients) {
-        // Return example ["The warning message here", "milk", "cheese", "lactose"]
+    public ArrayList checkPore(ArrayList<String> ingredients) {
+
         ArrayList returnList = new ArrayList();
         String returnString = new String();
         if (this.userAllergens.get(6).equals("1")) {
-            //Log.i("Parse", "LACTOSE");
-            returnList.add("Warning: Since you are lactose intolerant you may want to avoid eating this. It contains...");
-            returnString += "Warning Since you are lactose intolerant you may want to avoid eating this. It contains";
+
+            returnList.add("Warning: Since you have sensitive pores you may want to avoid using this. It contains...");
+            returnString += "Warning: Since you have sensitive pores you may want to avoid using this. It contains...";
             ArrayList<String> allIngredients = this.processInput(ingredients);
             for (String ingredient : allIngredients) {
-                for (String item : this.allLactose) {
+                for (String item : this.allPore) {
                     if (ingredient.contains(item)) {
                         returnList.add(item);
                         returnString += " " + item;
@@ -228,17 +217,17 @@ public class TextParser  {
         return returnList;
     }
 
-    public ArrayList checkVegan(ArrayList<String> ingredients) {
+    public ArrayList checkSensitive(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "gluten", "pork", "beef"]
         ArrayList returnList = new ArrayList();
         String returnString = new String();
         if (this.userAllergens.get(7).equals("1")) {
-            // Log.i("Parse", "VEGAN");
-            returnList.add("Warning: Since you are a vegan you may want to avoid eating this. It contains...");
-            returnString += "Warning Since you are a vegan you may want to avoid eating this. It contains";
+
+            returnList.add("Warning: Since you have sensitive skin you may want to avoid using this. It contains...");
+            returnString += "Warning: Since you have sensitive skin you may want to avoid using this. It contains...";
             ArrayList<String> allIngredients = this.processInput(ingredients);
             for (String ingredient : allIngredients) {
-                for (String item : this.allVegan) {
+                for (String item : this.allSensitive) {
                     if (ingredient.contains(item)) {
                         returnList.add(item);
                         returnString += " " + item;
@@ -256,17 +245,17 @@ public class TextParser  {
         return returnList;
     }
 
-    public ArrayList checkVegaterian(ArrayList<String> ingredients) {
+    public ArrayList checkOrganic(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "veal", "pork", "beef"]
         ArrayList returnList = new ArrayList();
         String returnString = new String();
         if (this.userAllergens.get(8).equals("1")) {
             // Log.i("Parse", "VEGETARIAN");
-            returnList.add("Warning: Since you are a vegetarian you may want to avoid eating this. It contains...");
-            returnString += "Warning Since you are a vegetarian you may want to avoid eating this. It contains";
+            returnList.add("Warning: Since you want a 100% Organic product you might want to avoid this. It contains...");
+            returnString += "Warning: Since you want a 100% Organic product you might want to avoid this. It contains...";
             ArrayList<String> allIngredients = this.processInput(ingredients);
             for (String ingredient : allIngredients) {
-                for (String item : this.allVegetarian) {
+                for (String item : this.allOrganic) {
                     if (ingredient.contains(item)) {
                         returnList.add(item);
                         returnString += " " + item;
@@ -284,17 +273,18 @@ public class TextParser  {
         return returnList;
     }
 
-    public ArrayList checkGluten(ArrayList<String> ingredients) {
-        // Return example ["The warning message here", "Gluten", "rye"]
+    public ArrayList checkCruelty(ArrayList<String> ingredients) {
+
+
         ArrayList returnList = new ArrayList();
         String returnString = new String();
         if (this.userAllergens.get(9).equals("1")) {
             // Log.i("Parse", "GLUTEN");
-            returnList.add("Warning: Since you prefer gluten free foods you may want to avoid eating this. It contains...");
-            returnString += "Warning Since you prefer gluten free foods you may want to avoid eating this. It contains";
+            returnList.add("Warning: Since you prefer cruelty free products you may want to avoid using this. It contains...");
+            returnString += "Warning: Since you prefer cruelty free products you may want to avoid using this. It contains...";
             ArrayList<String> allIngredients = this.processInput(ingredients);
             for (String ingredient : allIngredients) {
-                for (String item : this.allVegetarian) {
+                for (String item : this.allOrganic) {
                     if (ingredient.contains(item)) {
                         returnList.add(item);
                         returnString += " " + item;

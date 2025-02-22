@@ -1,0 +1,7 @@
+#Sun Nov 10 15:53:50 IST 2024
+base.0=C\:\\OCR-Food-ingredients-\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes.dex
+base.1=C\:\\OCR-Food-ingredients-\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes2.dex
+path.0=classes.dex
+path.1=classes2.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex

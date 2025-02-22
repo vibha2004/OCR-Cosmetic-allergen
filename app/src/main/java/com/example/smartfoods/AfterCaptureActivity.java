@@ -74,10 +74,10 @@ public class AfterCaptureActivity extends AppCompatActivity {
         }
 
         ArrayList<ArrayList<String>> allergenItems = parser.checkAllergens(itemList);
-        ArrayList<String> lactoseItems = parser.checkLactose(itemList);
-        ArrayList<String> veganItems = parser.checkVegan(itemList);
-        ArrayList<String> vegetarianItems = parser.checkVegaterian(itemList);
-        ArrayList<String> glutenItems = parser.checkGluten(itemList);
+        ArrayList<String> lactoseItems = parser.checkPore(itemList);
+        ArrayList<String> veganItems = parser.checkSensitive(itemList);
+        ArrayList<String> vegetarianItems = parser.checkOrganic(itemList);
+        ArrayList<String> glutenItems = parser.checkCruelty(itemList);
 
         Log.i("size allergerns", "" + allergenItems.size());
         Log.i("size lactoseItems", "" + lactoseItems.size());
