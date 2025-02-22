@@ -1,14 +1,17 @@
 package com.example.smartfoods;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
 import android.util.Log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class TextParser  {
+public class TextParser {
 
     public ArrayList<ArrayList<String>> allAllergens;
     public ArrayList<String> userAllergens = new ArrayList<>();
@@ -17,31 +20,79 @@ public class TextParser  {
     public ArrayList<String> allVegetarian;
     public ArrayList<String> allGluten;
 
+    // List of common date formats to try
+    private static final String[] DATE_FORMATS = {
+            "dd/MM/yy", "dd/MM/yyyy","MM/dd/yy", "yyyy-MM-dd", "dd-MM-yyyy",
+            "dd.MM.yyyy", "MM.dd.yyyy", "yyyy.MM.dd"
+    };
+
     public TextParser() {
         this.allAllergens = this.fillInAllergens();
-        this.allLactose = (new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
-                "curds", "lactose", "lactulose", "lactate", "custard", "yogurt")));
-        this.allVegan = (new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
+        this.allLactose = new ArrayList<>(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
+                "curds", "lactose", "lactulose", "lactate", "custard", "yogurt"));
+        this.allVegan = new ArrayList<>(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
                 "curds", "lactose", "lactulose", "lactate", "custard", "yogurt", "pork", "meat", "beef", "chicken",
                 "honey", "lamb", "veal", "turkey", "egg", "anchovies", "bass", "catfish", "cod", "grouper", "haddock",
                 "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
-                "lobster", "shrimp", "mussels", "squid", "ham", "bacon", "gelatin")));
-        this.allVegetarian = (new ArrayList(Arrays.asList("pork", "meat", "beef", "chicken",
+                "lobster", "shrimp", "mussels", "squid", "ham", "bacon", "gelatin"));
+        this.allVegetarian = new ArrayList<>(Arrays.asList("pork", "meat", "beef", "chicken",
                 "lamb", "veal", "turkey", "egg", "anchovies", "bass", "catfish", "cod", "grouper", "haddock",
                 "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
-                "lobster", "shrimp", "mussels", "squid", "ham", "bacon")));
-        this.allGluten = (new ArrayList(Arrays.asList("wheat", "rye", "barley", "bulgur", "couscous", "farina", "flour")));
+                "lobster", "shrimp", "mussels", "squid", "ham", "bacon"));
+        this.allGluten = new ArrayList<>(Arrays.asList("wheat", "rye", "barley", "bulgur", "couscous", "farina", "flour"));
     }
 
+    // Method to extract and validate dates
+    public String extractExpiryDate(ArrayList<String> ingredients) {
+        List<String> potentialDates = new ArrayList<>();
+
+        // Regex to match dates in various formats
+        String dateRegex = "\\b(\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4})\\b";
+        Pattern pattern = Pattern.compile(dateRegex);
+
+        for (String line : ingredients) {
+            Matcher matcher = pattern.matcher(line);
+            while (matcher.find()) {
+                potentialDates.add(matcher.group(1));
+            }
+        }
+
+        // Validate dates and determine expiry date
+        long currentTime = System.currentTimeMillis();
+        String expiryDate = null;
+        long minDifference = Long.MAX_VALUE;
+
+        for (String dateStr : potentialDates) {
+            for (String format : DATE_FORMATS) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat(format);
+                    sdf.setLenient(false);
+                    Date date = sdf.parse(dateStr);
+                    long difference = date.getTime() - currentTime;
+
+                    // If the date is in the future, it's likely the expiry date
+                    if (difference > 0 && difference < minDifference) {
+                        expiryDate = dateStr;
+                        minDifference = difference;
+                    }
+                } catch (ParseException e) {
+                    // Ignore and try the next format
+                }
+            }
+        }
+
+        return expiryDate;
+    }
+
+    // Rest of the existing methods...
     public static void main(String[] args) {
         TextParser tt = new TextParser();
 
         tt.setUserPreferences("1111111111");
-        ArrayList<String> ii = new ArrayList<String>(Arrays.asList(" hoiusdfhium,, oifdshj hif  1.Gelatingt"));
+        ArrayList<String> ii = new ArrayList<>(Arrays.asList(" hoiusdfhium,, oifdshj hif  1.Gelatingt"));
         ArrayList<ArrayList> done = tt.checkAllergens(ii);
         ArrayList<String> done2 = tt.checkLactose(ii);
         ArrayList<String> done3 = tt.checkVegan(ii);
-
 
         for (ArrayList<String> sub : done) {
             for (String str : sub) {
@@ -56,20 +107,18 @@ public class TextParser  {
         for (String str : done3) {
             System.out.println(str);
         }
-
     }
 
     public int getUserBmr(int mass, int age, int height) {
         double menBmr = 66.473 + (13.7516 * mass) + (5.0033 * height) - (6.755 * age);
         double womenBmr = 655.0955 + (9.5634 * mass) + (1.8496 * height) + (4.6756 * age);
-        int result = (int) (menBmr + womenBmr) / 2;
-        return result;
+        return (int) ((menBmr + womenBmr) / 2);
     }
 
     public ArrayList checkNutrition(ArrayList<String> nutritionFactsInput, String mass, String age, String height) {
         ArrayList nutritionFacts = this.processInput(nutritionFactsInput);
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         int userMass;
         int userAge;
         int userHeight;
@@ -84,9 +133,9 @@ public class TextParser  {
         }
         if (nutritionFacts.contains("calories")) {
             try {
-                int calories = Integer.valueOf((nutritionFacts.indexOf("calories") + 1));
+                int calories = Integer.parseInt(nutritionFacts.get(nutritionFacts.indexOf("calories") + 1).toString());
                 int userBmr = getUserBmr(userMass, userAge, userHeight);
-                int percent_cal = (int) ((userBmr / calories) * 100);
+                int percent_cal = (int) ((userBmr / (double) calories) * 100);
                 if (calories > userBmr) {
                     returnList.add("The calorie count in this food is over the daily recommended minimum for you!");
                     returnString += " The calorie count in this food is over the daily recommended minimum for you!";
@@ -104,7 +153,7 @@ public class TextParser  {
         }
         if (nutritionFacts.contains("sodium")) {
             try {
-                int sodium_mass = Integer.valueOf(nutritionFacts.indexOf("sodium") + 1);
+                int sodium_mass = Integer.parseInt(nutritionFacts.get(nutritionFacts.indexOf("sodium") + 1).toString());
                 int percent_sodium = ((sodium_mass / 2300) * 100);
                 if (percent_sodium > 100) {
                     returnList.add("The sodium content in this food is over the daily recommended limit of 2300 miligrams !");
@@ -120,7 +169,6 @@ public class TextParser  {
                 returnList.add("Sodium related data could not be calculated");
                 returnString += " Sodium related data could not be calculated";
             }
-
         }
         if (returnString.length() > 0) {
             returnList.add(returnString);
@@ -131,27 +179,27 @@ public class TextParser  {
     public ArrayList fillInAllergens() {
         ArrayList returnList = new ArrayList();
         // milk allergens
-        returnList.add(new ArrayList(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
+        returnList.add(new ArrayList<>(Arrays.asList("milk", "butter", "buttermilk", "casein", "cheese", "cream",
                 "curds", "lactose", "lactulose", "lactate", "custard", "yogurt")));
         // egg allergens
-        returnList.add(new ArrayList(Arrays.asList("globulin", "egg", "eggs", "eggnog", "lysozyme", "albumin")));
+        returnList.add(new ArrayList<>(Arrays.asList("globulin", "egg", "eggs", "eggnog", "lysozyme", "albumin")));
         // peanut/nut allergens
-        returnList.add(new ArrayList(Arrays.asList("peanut", "nuts", "nut", "almond",
+        returnList.add(new ArrayList<>(Arrays.asList("peanut", "nuts", "nut", "almond",
                 "beechnut", "walnut", "butternut", "cashew",
                 "chestnut", "pecan", "pistachio")));
         // wheat allergens
-        returnList.add(new ArrayList(Arrays.asList("wheat", "bread", "bulgur", "cereal", "cracker", "flour")));
+        returnList.add(new ArrayList<>(Arrays.asList("wheat", "bread", "bulgur", "cereal", "cracker", "flour")));
         // soy allergens
-        returnList.add(new ArrayList(Arrays.asList("soy", "soya", "miso", "tofu", "edamame")));
+        returnList.add(new ArrayList<>(Arrays.asList("soy", "soya", "miso", "tofu", "edamame")));
         // seafood allergens
-        returnList.add(new ArrayList(Arrays.asList("anchovies", "bass", "catfish", "cod", "grouper", "haddock",
+        returnList.add(new ArrayList<>(Arrays.asList("anchovies", "bass", "catfish", "cod", "grouper", "haddock",
                 "pike", "salmon", "snapper", "tilapia", "tuna", "trout", "fish", "crawfish", "crab", "krill",
                 "lobster", "shrimp", "mussels", "squid")));
         return returnList;
     }
 
     public ArrayList processInput(ArrayList<String> ingredients) {
-        ArrayList<String> allIngredients = new ArrayList();
+        ArrayList<String> allIngredients = new ArrayList<>();
         // turn ingredient list passed in into a single array called allIngredients
         String line;
         String[] linePieces;
@@ -167,20 +215,20 @@ public class TextParser  {
 
     public ArrayList checkAllergens(ArrayList<String> ingredients) {
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         ArrayList<String> allIngredients = this.processInput(ingredients);
-        ArrayList mapping = new ArrayList(Arrays.asList("milk allergen(s)", "egg allergen(s)", "peanut/nut allergen(s)",
+        ArrayList mapping = new ArrayList<>(Arrays.asList("milk allergen(s)", "egg allergen(s)", "peanut/nut allergen(s)",
                 "wheat allergen(s)", "soy allergen(s)", "seafood allergen(s)"));
 
         // now iterate and find any allergens
         ArrayList<String> temp;
         for (int index = 0; index < 6; index++) {
             if (this.userAllergens.get(index).equals("1")) {
-                temp = new ArrayList();
+                temp = new ArrayList<>();
                 temp.add(("Possible " + mapping.get(index)));
                 for (String allergen : this.allAllergens.get(index)) {
                     for (String ingredient : allIngredients) {
-                        if (ingredient.contains(allergen) && temp.contains(allergen) == false) {
+                        if (ingredient.contains(allergen) && !temp.contains(allergen)) {
                             temp.add(allergen);
                         }
                     }
@@ -191,7 +239,6 @@ public class TextParser  {
                     }
                     returnList.add(temp);
                 }
-
             }
         }
         if (returnString.length() > 0) {
@@ -203,9 +250,8 @@ public class TextParser  {
     public ArrayList checkLactose(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "milk", "cheese", "lactose"]
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         if (this.userAllergens.get(6).equals("1")) {
-            //Log.i("Parse", "LACTOSE");
             returnList.add("Warning: Since you are lactose intolerant you may want to avoid eating this. It contains...");
             returnString += "Warning Since you are lactose intolerant you may want to avoid eating this. It contains";
             ArrayList<String> allIngredients = this.processInput(ingredients);
@@ -219,7 +265,7 @@ public class TextParser  {
             }
             if (returnList.size() <= 1) {
                 returnList = new ArrayList();
-                returnString = new String();
+                returnString = "";
             }
             if (returnString.length() > 0) {
                 returnList.add(returnString);
@@ -231,9 +277,8 @@ public class TextParser  {
     public ArrayList checkVegan(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "gluten", "pork", "beef"]
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         if (this.userAllergens.get(7).equals("1")) {
-            // Log.i("Parse", "VEGAN");
             returnList.add("Warning: Since you are a vegan you may want to avoid eating this. It contains...");
             returnString += "Warning Since you are a vegan you may want to avoid eating this. It contains";
             ArrayList<String> allIngredients = this.processInput(ingredients);
@@ -247,11 +292,11 @@ public class TextParser  {
             }
             if (returnList.size() <= 1) {
                 returnList = new ArrayList();
-                returnString = new String();
+                returnString = "";
             }
-        }
-        if (returnString.length() > 0) {
-            returnList.add(returnString);
+            if (returnString.length() > 0) {
+                returnList.add(returnString);
+            }
         }
         return returnList;
     }
@@ -259,9 +304,8 @@ public class TextParser  {
     public ArrayList checkVegaterian(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "veal", "pork", "beef"]
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         if (this.userAllergens.get(8).equals("1")) {
-            // Log.i("Parse", "VEGETARIAN");
             returnList.add("Warning: Since you are a vegetarian you may want to avoid eating this. It contains...");
             returnString += "Warning Since you are a vegetarian you may want to avoid eating this. It contains";
             ArrayList<String> allIngredients = this.processInput(ingredients);
@@ -275,11 +319,11 @@ public class TextParser  {
             }
             if (returnList.size() <= 1) {
                 returnList = new ArrayList();
-                returnString = new String();
+                returnString = "";
             }
-        }
-        if (returnString.length() > 0) {
-            returnList.add(returnString);
+            if (returnString.length() > 0) {
+                returnList.add(returnString);
+            }
         }
         return returnList;
     }
@@ -287,9 +331,8 @@ public class TextParser  {
     public ArrayList checkGluten(ArrayList<String> ingredients) {
         // Return example ["The warning message here", "Gluten", "rye"]
         ArrayList returnList = new ArrayList();
-        String returnString = new String();
+        String returnString = "";
         if (this.userAllergens.get(9).equals("1")) {
-            // Log.i("Parse", "GLUTEN");
             returnList.add("Warning: Since you prefer gluten free foods you may want to avoid eating this. It contains...");
             returnString += "Warning Since you prefer gluten free foods you may want to avoid eating this. It contains";
             ArrayList<String> allIngredients = this.processInput(ingredients);
@@ -303,11 +346,11 @@ public class TextParser  {
             }
             if (returnList.size() <= 1) {
                 returnList = new ArrayList();
-                returnString = new String();
+                returnString = "";
             }
-        }
-        if (returnString.length() > 0) {
-            returnList.add(returnString);
+            if (returnString.length() > 0) {
+                returnList.add(returnString);
+            }
         }
         return returnList;
     }

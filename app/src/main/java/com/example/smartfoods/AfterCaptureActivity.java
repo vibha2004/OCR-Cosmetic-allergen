@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -20,7 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smartfoods.ocr.OcrCaptureActivity;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class AfterCaptureActivity extends AppCompatActivity {
@@ -30,6 +32,7 @@ public class AfterCaptureActivity extends AppCompatActivity {
     Button textToSpeechButton;
     ImageView icon;
     TextView titleText;
+    TextView expiryLabel; // Add this field
     TextParser parser = new TextParser();
     LinearLayout badIngredientsBox;
     Drawable check;
@@ -37,21 +40,26 @@ public class AfterCaptureActivity extends AppCompatActivity {
     String preferences;
     TextToSpeech ts;
     StringBuilder speechText = new StringBuilder();
+    private static final long ONE_DAY_IN_MILLIS = 86400000; // 24 hours in milliseconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_capture);
 
-        anotherPicture = (Button) findViewById(R.id.AnotherPicture);
+        anotherPicture = findViewById(R.id.AnotherPicture);
         preferences = getIntent().getExtras().getString("preferences");
         Log.i("Prefs:", "In the after capture act " + preferences);
 
         itemList = (ArrayList<String>) getIntent().getSerializableExtra("ING-LIST");
-        icon = (ImageView) findViewById(R.id.icon);
-        titleText = (TextView) findViewById(R.id.TitleText);
-        badIngredientsBox = (LinearLayout) findViewById(R.id.BadIngredientsBox);
-        textToSpeechButton = (Button) findViewById(R.id.TextToSpeech);
+        icon = findViewById(R.id.icon);
+        titleText = findViewById(R.id.TitleText);
+        badIngredientsBox = findViewById(R.id.BadIngredientsBox);
+        textToSpeechButton = findViewById(R.id.TextToSpeech);
+        expiryLabel = findViewById(R.id.ExpiryLabel); // Initialize expiry label
+
+        // Log the item list to verify OCR text
+        Log.i("ItemList", "Item List: " + itemList.toString());
 
         parser.setUserPreferences(preferences);
 
@@ -85,7 +93,6 @@ public class AfterCaptureActivity extends AppCompatActivity {
         Log.i("size vegetarianItems", "" + vegetarianItems.size());
         Log.i("size glutenItems", "" + glutenItems.size());
 
-
         if (noBadIngredients(allergenItems, lactoseItems, veganItems, vegetarianItems, glutenItems)) {
             Log.i("OK", "its a");
             speechText.append("The ingredients are okay.");
@@ -117,14 +124,16 @@ public class AfterCaptureActivity extends AppCompatActivity {
             if (glutenItems.size() > 0) {
                 displayNegative(glutenItems);
             }
-
         }
+
+        // Check expiry date
+        String expiryDate = parser.extractExpiryDate(itemList);
+        Log.i("ExpiryDate", "Extracted Expiry Date: " + expiryDate); // Log the extracted expiry date
+        checkExpiryDate(expiryDate);
 
         anotherPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // Launch After Capture Activity
                 Intent intent = new Intent(AfterCaptureActivity.this, OcrCaptureActivity.class);
                 intent.putExtra("preferences", preferences);
                 startActivity(intent);
@@ -134,15 +143,13 @@ public class AfterCaptureActivity extends AppCompatActivity {
         textToSpeechButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //ts.speak(speechText.toString(), TextToSpeech.QUEUE_FLUSH, null);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ts.speak(speechText,TextToSpeech.QUEUE_FLUSH,null,null);
+                    ts.speak(speechText.toString(), TextToSpeech.QUEUE_FLUSH, null, null);
                 } else {
-                    //ts.speak(speechText, TextToSpeech.QUEUE_FLUSH, null);
+                    ts.speak(speechText.toString(), TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         });
-
     }
 
     private boolean noBadIngredients(ArrayList<ArrayList<String>> a,
@@ -150,7 +157,6 @@ public class AfterCaptureActivity extends AppCompatActivity {
                                      ArrayList<String> c,
                                      ArrayList<String> d,
                                      ArrayList<String> e) {
-
         return (a.size() == 0) && (b.size() == 0) && (c.size() == 0) && (d.size() == 0) && (e.size() == 0);
     }
 
@@ -162,22 +168,8 @@ public class AfterCaptureActivity extends AppCompatActivity {
     }
 
     private void displayNegativeNested(ArrayList<ArrayList<String>> result) {
-        Log.i("Cheese", "displayNegNested");
-
         for (int i = 0; i < result.size() - 1; i++) {
             for (int j = 0; j < result.get(i).size(); j++) {
-                Log.i("Cheese", result.get(i).get(j));
-            }
-        }
-
-        Log.i("Cheese", "Weaning stringL " + result.get(result.size() - 1));
-
-        speechText.append(result.get(result.size() - 1));
-        speechText.append(" ");
-
-        for (int i = 0; i < result.size() - 1; i++) {
-            for (int j = 0; j < result.get(i).size(); j++) {
-                Log.i("OK", result.get(i).get(j));
                 TextView text = new TextView(this);
                 text.setText(result.get(i).get(j));
                 text.setTextColor(Color.rgb(209, 89, 98));
@@ -186,18 +178,12 @@ public class AfterCaptureActivity extends AppCompatActivity {
                 badIngredientsBox.addView(text);
             }
         }
-
-
+        speechText.append(result.get(result.size() - 1));
+        speechText.append(" ");
     }
 
     private void displayNegative(ArrayList<String> result) {
-        Log.i("Cheese", "in" + result.size());
         for (int i = 0; i < result.size() - 1; i++) {
-            Log.i("Cheese", result.get(i));
-        }
-
-        for (int i = 0; i < result.size() - 1; i++) {
-            Log.i("OK", result.get(i));
             TextView text = new TextView(this);
             text.setText(result.get(i));
             text.setTextColor(Color.rgb(209, 89, 98));
@@ -209,5 +195,50 @@ public class AfterCaptureActivity extends AppCompatActivity {
         speechText.append(" ");
     }
 
+    private void checkExpiryDate(String expiryDate) {
+        if (expiryDate == null || expiryDate.isEmpty()) {
+            expiryLabel.setText("Expiry Date: Not Found");
+            expiryLabel.setBackgroundColor(Color.GRAY);
+            Log.i("ExpiryDate", "No expiry date found or invalid format");
+            return;
+        }
 
+        long currentTime = System.currentTimeMillis();
+        long expiryTime = parseExpiryDate(expiryDate);
+
+        if (expiryTime == -1) {
+            expiryLabel.setText("Expiry Date: Invalid Format");
+            expiryLabel.setBackgroundColor(Color.GRAY);
+            Log.i("ExpiryDate", "Invalid expiry date format: " + expiryDate);
+            return;
+        }
+
+        long difference = expiryTime - currentTime;
+
+        if (difference > 7 * ONE_DAY_IN_MILLIS) {
+            expiryLabel.setText("Expiry Date: Fresh (" + expiryDate + ")");
+            expiryLabel.setBackgroundColor(Color.GREEN);
+            Log.i("ExpiryDate", "Product is fresh: " + expiryDate);
+        } else if (difference > 0) {
+            expiryLabel.setText("Expiry Date: Near Expiry (" + expiryDate + ")");
+            expiryLabel.setBackgroundColor(Color.YELLOW);
+            Log.i("ExpiryDate", "Product is near expiry: " + expiryDate);
+        } else {
+            expiryLabel.setText("Expiry Date: Expired (" + expiryDate + ")");
+            expiryLabel.setBackgroundColor(Color.RED);
+            Log.i("ExpiryDate", "Product is expired: " + expiryDate);
+        }
+    }
+
+    private long parseExpiryDate(String expiryDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            Date date = sdf.parse(expiryDate);
+            return date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.e("ExpiryDate", "Error parsing expiry date: " + expiryDate);
+            return -1;
+        }
+    }
 }
